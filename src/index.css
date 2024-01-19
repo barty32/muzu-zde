@@ -1,0 +1,115 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#root {
+  height: 100vh;
+}
+
+body {
+  font-family: sans-serif;
+  height: 800px;
+}
+
+nav {
+  background-color: rgb(106, 150, 119);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  height: 60px;
+  color: rgb(218, 218, 218);
+}
+
+.location_display {
+  text-align: right;
+}
+
+h1 a {
+  text-decoration: none;
+  color: white;
+}
+
+.button_grid {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.big_button {
+  max-width: 350px;
+  width: 100%;
+  height: 150px;
+}
+
+.big_button button {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.menu_itemp {
+  font-size: 23px;
+}
+
+.menu_itemp a {
+  color: white;
+  text-decoration: none;
+}
+
+.menu_itemp a:hover {
+  text-decoration: underline;
+}
+
+.home_wrap {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home_column {
+  max-width: 720px;
+  width: 100%;
+}
+
+.home_column h1 {
+  margin-bottom: 10px;
+  border-bottom: 3px solid gray;
+}
+
+.home_wrap div {
+  width: 100%;
+}
+
+.map {
+  position: relative;
+}
+
+.follow_user_button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100000;
+}
+
+.follow_user_button button {
+  padding: 10px;
+}
+
+.disabled {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.filter_bar {
+  padding: 10px;
+}

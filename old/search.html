@@ -1,0 +1,179 @@
+<!-- <!DOCTYPE html> -->
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <link rel="stylesheet" href="./style.css" />
+    </head>
+
+    <body>
+        <nav>
+            <div class="title">
+                <h1>Královéhradecký Školský Kompas</h1>
+            </div>
+        </nav>
+        <main>
+            <div class="filters">
+				<div class="search_box_container">
+                <input type="text" id="search_box"><button onclick="show()">hledat</button>
+				</div>
+                <h2>Filtry</h2>
+                <hr>
+
+
+                <div>
+                    <button type="button" class="collapsible">Typ školy</button>
+                    <div class="collapsible_content">
+                        <div><input type="checkbox" id="is_stredni_skola" class="action_element" checked
+                                onchange="show()">Střední škola</div>
+                        <div><input type="checkbox" id="is_vyssi_odborna_skola" class="action_element" checked
+                                onchange="show()">Vyšší odborná škola</div>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="collapsible">Obor</button>
+                    <div class="collapsible_content">
+                        <div id="obor_select">
+                            <input type="checkbox" onchange="toggleAll(event, '#obor_select'); show(event);"
+                                id="obor_default" checked /><label for="obor_default">Vše</label>
+                        </div>
+
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="collapsible">Obec</button>
+                    <div class="collapsible_content">
+                        <select id="obce_select" onchange="show()">
+                            <option value="">Vše</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="collapsible">Přijímací zkouška</button>
+                    <div class="collapsible_content">
+                        <div id="prijimacky_select">
+                            <input type="checkbox" onchange="toggleAll(event, '#prijimacky_select'); show(event);"
+                                id="prijimack_default" checked /><label for="prijimack_default">Vše</label>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="collapsible">Roční školné</button>
+                        <div class="collapsible_content">
+
+                            <div><span>Od</span><input type="range" name="" id="skolne_od_inp"
+                                    onchange="show(); document.querySelector('#skolne_od').innerText = event.target.value;"
+                                    min="0" max="60000" value="0"><span id="skolne_od">0</span>Kč</div>
+                            <div><span>Do</span><input type="range" name="" id="skolne_do_inp"
+                                    onchange="show(); document.querySelector('#skolne_do').innerText = event.target.value;"
+                                    min="0" max="60000" value="0"><span id="skolne_do">0</span>Kč</div>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="collapsible">Forma studia</button>
+                        <div class="collapsible_content">
+                            <select name="" id="">
+                                <option value="">denní</option>
+                                <option value="">dálkové</option>
+                                <option value="">kombinované</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="collapsible">Způsob ukončení studia</button>
+                        <div class="collapsible_content">
+                            <select name="" id="">
+                                <option value="">maturita</option>
+                                <option value="">výuční list</option>
+                                <option value="">závěrečná zkouška</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="collapsible">Délka studia</button>
+                        <div class="collapsible_content">
+                            <div><span>Od</span><input type="range" name="" id="delka_od_inp"
+                                    onchange="show(); document.querySelector('#delka_od').innerText = event.target.value;"
+                                    min="1" max="10" value="1"><span id="delka_od">1</span>let</div>
+                            <div><span>Do</span><input type="range" name="" id="delka_do_inp"
+                                    onchange="show(); document.querySelector('#delka_do').innerText = event.target.value;"
+                                    min="1" max="10" value="10"><span id="delka_do">10</span>let</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="results">
+                <div class="results_options">
+                    <div>
+                        <span>Řadit podle: </span> <select name="" id="">
+                            <option value="">Relevance</option>
+                            <option value="">Název (sestupně)</option>
+                            <option value="">Název (vzestupně)</option>
+                            <option value="">Poměr přijetí (sestupně)</option>
+                            <option value="">Poměr přijetí (vzestupně)</option>
+                            <option value="">Školné (sestupně)</option>
+                            <option value="">Školné (vzestupně)</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="results_page">
+
+                </div>
+            </div>
+            <div class="display_area">
+                <div class="tab">
+                    <button class="tablinks active" onclick="openCity(event, 'maptab')">Mapa</button>
+                    <button class="tablinks" onclick="openCity(event, 'graphstab')">Grafy</button>
+                </div>
+
+                <div id="maptab" class="tabcontent" style="display: block;">
+                    <div id="map"></div>
+                </div>
+
+                <div id="graphstab" class="tabcontent">
+                    <div id="charts">
+                        <div id="chart1"></div>
+                        <div id="chart2"></div>
+						<table id="table"></table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="js/script.js"></script>
+        <script src="js/chart.js"></script>
+
+        <script>
+
+
+
+            //var marker = L.marker([50.8580089, 14.7970539]).addTo(map);
+
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for(i = 0; i < coll.length; i++) {
+                coll[i].addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if(content.style.display === "block") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                });
+            }
+        </script>
+    </body>
+
+</html>
