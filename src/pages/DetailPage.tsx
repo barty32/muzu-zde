@@ -1,6 +1,7 @@
 import { LatLng } from "leaflet";
 import Zone from "../components/Zone";
 import { DetailType, ZoneType } from "../types";
+import POIList from "../components/POIList";
 
 export interface DetailPageProps {
 	coords: LatLng | null;
@@ -29,7 +30,7 @@ const DetailPage: React.FC<DetailPageProps> = ({coords}) => {
 		case 'nabijeci_stanice':
 		case 'kontejner_elektro':
 		case 'kontejner_kov':
-			// return <Zone coords={coords} type={type} />
+			return <POIList coords={coords} type={type} />
 			
 		default:
 			return <div>Nerozpoznaný typ (chyba v aplikaci).</div>
