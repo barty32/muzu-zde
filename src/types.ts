@@ -4,7 +4,7 @@ export type POI = PointOfInterest;
 export interface PointOfInterest {
   id: string;
   coords: LatLng;
-  type: string;
+  type: PointType;
   extraData?: any;
 }
 

@@ -6,17 +6,24 @@ import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { FaQuestion } from "react-icons/fa";
 import POIRow from "./POIRow";
 import { Link } from "react-router-dom";
+import Modal from 'react-modal';
+import Map from "./Map";
 
 
 export interface POIListProps {
 	type: PointType;
 	coords: LatLng;
+	updatePosition: () => void;
 }
 
-const POIList: React.FC<POIListProps> = ({ type, coords }) => {
+const POIList: React.FC<POIListProps> = ({ type, coords, updatePosition }) => {
 
 	const [status, setStatus] = useState<POI[]>([]);
 	const [numElements, setNumElements] = useState(10);
+
+	const [mapModalOpen, setMapModalOpen] = useState(false);
+
+	const [activeItem, setActiveItem] = useState<POI | null>(null);
 
 	useEffect(() => {
 		//ckeck location
@@ -35,6 +42,11 @@ const POIList: React.FC<POIListProps> = ({ type, coords }) => {
 		setNumElements(numElements + numOfElements);
 	}
 
+	const onMapOpened = (element: POI) => {
+		setActiveItem(element);
+		setMapModalOpen(true);
+	}
+
 	const fancyNameMap: { [key: string]: string } = {
 		'kontejner_elektro': 'Místa zpětného odběru elektroodpadu',
 		'kontejner_kov': 'Kontejnery na kovy',
@@ -45,37 +57,59 @@ const POIList: React.FC<POIListProps> = ({ type, coords }) => {
 		'park_ztp': 'Parkovací místa pro držitele ZTP',
 	}
 
+	const tableHeaders = ['Vzdálenost', 'Ulice'];
+
+	if (type == 'park_automat') {
+		tableHeaders.push('Kód', 'Zóna');
+	}
+	else if (type == 'park_ztp') {
+		tableHeaders.push('Počet');
+	}
+	else if (type == 'nabijeci_stanice') {
+		tableHeaders.push('Provozovatel');
+	}
+	else if (type.includes('kontejner')) {
+		tableHeaders.push(/*'Typ kontejneru', */'Četnost vývozu');
+	}
+
 	if (!status.length) return <div>Nebyly nalezeny žádné body zájmu.</div>
 
 	return (
 		<div className={`poi_list_wrapper`}>
+			<button className="poi_show_all"><Link to={`/map?map_layers=${type}`}>Zobrazit vše na mapě</Link></button>
 			<h1>{fancyNameMap[type]}</h1>
-			<button><Link to={`/map?map_layers=${type}`}>Zobrazit vše na mapě</Link></button>
-			<table>
-				<tr>
-					<td>Vzdálenost</td>
-					<td>Adresa</td>
-					<td>Mapa</td>
-				</tr>
+			<table className="poi_table">
+				<thead>
+					<tr>
+						{
+							tableHeaders.map((k, i) => {
+								return <th key={i}>{k}</th>
+							})
+						}
+					</tr>
+				</thead>
 				{status.slice(0, numElements).map((k, i) => (
-					<POIRow key={k.id} coords={coords} poi={k}/>
+					<POIRow key={k.id} coords={coords} poi={k} onMapOpened={onMapOpened} fontSize={((40 - 1.5 * i) > 20 ? (40 - 1.5 * i) : 20)} />
 				))}
 			</table>
-			{numElements < status.length && <button onClick={() => showMore()}>Zobrazit víc</button>}
-			{/* {status == "allowed" ? (
-				<div>
-					<FaThumbsUp fontSize={200} />
-					<h2>Povoleno!</h2>
-					<p>Na tomto místě je povoleno {type == "alkohol" ? "pít alkohol" : type == "koureni" ? "kouřit" : ""}.</p>
+			{numElements < status.length && <button onClick={() => showMore()} className="more_button">Další</button>}
+
+
+			<Modal
+				isOpen={mapModalOpen}
+				onRequestClose={() => setMapModalOpen(false)}
+				style={{ content: { display: 'flex', flexDirection: 'column', gap: '10px' }, overlay: { zIndex: 1200 } }}
+				contentLabel="Example Modal"
+			>
+				<div className="modal_header">
+					<h2>Mapa</h2>
+					<button className="modal_close" onClick={() => setMapModalOpen(false)}>&times;</button>
 				</div>
-			) : status == "prohibited" ? (
-				<div>
-					<FaThumbsDown fontSize={200} />
-					<h2>Zákaz</h2>
-					<p>Na tomto místě je zakázáno {type == "alkohol" ? "pít alkohol" : type == "koureni" ? "kouřit" : ""}.</p>
+				<div className="modal_map_wrapper">
+					<Map coords={activeItem?.coords!} updatePosition={updatePosition} activeLayers={[activeItem?.type!]} updateLayers={() => { }} showLayerBox={false} />
 				</div>
-			) : <div><FaQuestion fontSize={200} /></div> */}
-			
+			</Modal>
+
 		</div>
 	);
 }

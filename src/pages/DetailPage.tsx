@@ -5,9 +5,10 @@ import POIList from "../components/POIList";
 
 export interface DetailPageProps {
 	coords: LatLng | null;
+	updatePosition: () => void;
 }
 
-const DetailPage: React.FC<DetailPageProps> = ({coords}) => {
+const DetailPage: React.FC<DetailPageProps> = ({coords, updatePosition}) => {
 
 	if (!coords) {
 		return <div>Poloha není k dispozici.</div>
@@ -30,10 +31,10 @@ const DetailPage: React.FC<DetailPageProps> = ({coords}) => {
 		case 'nabijeci_stanice':
 		case 'kontejner_elektro':
 		case 'kontejner_kov':
-			return <POIList coords={coords} type={type} />
+			return <POIList coords={coords} type={type} updatePosition={updatePosition}/>
 			
 		default:
-			return <div>Nerozpoznaný typ (chyba v aplikaci).</div>
+			return <div>Nerozpoznaný typ.</div>
 	}
 }
 

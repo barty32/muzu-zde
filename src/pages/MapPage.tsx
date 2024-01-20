@@ -28,7 +28,7 @@ const MapPage: React.FC<MapPageProps> = ({ coords, address, updatePosition }) =>
 	// const query = new URLSearchParams(document.location.search);
 	const mapLayers = query.get('map_layers')?.split(',') || [];
 
-	return (<Map coords={coords} address={address} updatePosition={updatePosition} activeLayers={mapLayers} updateLayers={updateLayers} />);
+	return (<div style={{ height: "100%", position: "relative", overflow: "hidden" }}><Map coords={coords} updatePosition={updatePosition} activeLayers={mapLayers} updateLayers={updateLayers} showLayerBox={ true } /></div>);
 }
 
 export default MapPage;

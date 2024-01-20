@@ -20,7 +20,7 @@ async function getWcData(): Promise<POI[]> {
   for (const feature of data.features) {
     const id = feature.properties ? feature.properties['GLOBALID'] : '';
     const coords = convertCoords3857((feature.geometry as Point).coordinates);
-    const point: POI = {id, coords, type: 'wc'};
+    const point: POI = {id, coords, type: 'verejne_wc'};
     result.push(point);
   }
   return result;

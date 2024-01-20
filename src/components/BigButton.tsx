@@ -35,7 +35,7 @@ const BigButton: React.FC<BigButtonProps> = ({ text, icon, action, accentColor, 
 	const targetColor = convertHexToRGBA(accentColor, 0.9);
 	const [style, setStyle] = useState<React.CSSProperties>({ borderColor: accentColor, backgroundColor: opaqueAccentColor });
 
-	return <div className="big_button" style={{ height: extraBig ? "350px" : "200px" }} onMouseEnter={() => setStyle({ ...style, backgroundColor: targetColor, color: "#eee" })} onMouseLeave={() => setStyle({ ...style, backgroundColor: opaqueAccentColor, color: "black" })}><Link to={`/detail?type=${action}`} style={style} >{icon != null && <div className="big_button_icon">{icon}</div>}{text}</Link></div>;
+	return <div className="big_button" style={{ height: extraBig ? "350px" : "200px", backgroundColor: "rgba(255, 255, 255, 0.8)", borderRadius: "10px" }}><div style={{ width: "100%", height: "100%" }} onMouseEnter={() => setStyle({ ...style, backgroundColor: targetColor, color: "#eee" })} onMouseLeave={() => setStyle({ ...style, backgroundColor: opaqueAccentColor, color: "black" })}><Link to={`/detail?type=${action}`} style={style} >{icon != null && <div className="big_button_icon" style={{ fontSize: (extraBig ? "60px" : "40px") }}>{icon}</div>}{text}</Link></div></div>;
 }
 
 export default BigButton;

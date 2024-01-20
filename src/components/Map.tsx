@@ -13,6 +13,7 @@ import Control from 'react-leaflet-custom-control'
 import { IoIosArrowBack } from "react-icons/io";
 import { GrStatusGoodSmall } from "react-icons/gr";
 import MarkerClusterGroup from 'react-leaflet-cluster'
+import LoadingScreen from "./LoadingScreen";
 
 
 
@@ -35,19 +36,20 @@ const SetView: React.FC<SetViewProps> = ({ coords, zoom, setShouldMove, shouldMo
 };
 export interface MapProps {
 	coords: LatLng | null;
-	address: string | null;
 	updatePosition: () => void;
 	activeLayers: string[];
 	updateLayers: (layer: DetailType, val: boolean) => void;
+	showLayerBox: boolean;
 }
-const Map: React.FC<MapProps> = ({ coords, address, updatePosition, activeLayers, updateLayers }) => {
+
+const Map: React.FC<MapProps> = ({ coords, updatePosition, activeLayers, updateLayers, showLayerBox }) => {
 
 	const [userCoords, setUserCoords] = useState<LatLngExpression>(PRAGUE_CENTER);
 	const [mapZoom, setMapZoom] = useState<number>(STARTING_MAP_ZOOM);
 	const [shouldMove, setShouldMove] = useState(true);
 
-	const [kontejnerySelected, setKontejnerySelected] = useState(false);
-	const [selectedKontejner, setSelectedKontejner] = useState<KontejnerType | null>(null);
+	const [kontejnerySelected, setKontejnerySelected] = useState<boolean>(activeLayers.find((val) => val.includes('kontejner_')) !== undefined);
+	const [selectedKontejner, setSelectedKontejner] = useState<KontejnerType | null>(activeLayers.find((val) => val.includes('kontejner_')) as (KontejnerType | null) || null);
 
 	const [kontejnerList, setKontejnerList] = useState<POI[]>([]);
 	const [toaletyList, setToaletyList] = useState<POI[]>([]);
@@ -91,6 +93,8 @@ const Map: React.FC<MapProps> = ({ coords, address, updatePosition, activeLayers
 		setMapZoom(HAS_COORDS_MAP_ZOOM);
 	}, [coords, shouldMove]);
 
+
+	const [loadingEnabled, setLoadingEnabled] = useState(true);
 	useEffect(() => {
 		if (selectedKontejner) {
 			getPointData(selectedKontejner).then(x => {
@@ -98,11 +102,17 @@ const Map: React.FC<MapProps> = ({ coords, address, updatePosition, activeLayers
 			});
 		}
 	}, [selectedKontejner]);
-	// useEffect(() => {
-	// 	if(showZakazAlkoholu) {
+	useEffect(() => {
 
-	// 	}
-	// }, [showZakazAlkoholu, showZakazKoureni]);
+	}, [showZakazAlkoholu, showZakazKoureni]);
+
+	useEffect(() => {
+		setLoadingEnabled(true);
+
+		setTimeout(() => {
+			setLoadingEnabled(false);
+		}, 1000);
+	}, [showZakazAlkoholu, showZakazKoureni, showVerejneWc, showNabijecky, showParkAutomaty, showParkZtp, showPitka, kontejnerList, kontejnerySelected]);
 
 	useEffect(() => {
 		getGEOJSONZoneData("./data/alkohol.geojson").then(d => {
@@ -159,7 +169,7 @@ const Map: React.FC<MapProps> = ({ coords, address, updatePosition, activeLayers
 		marker.style.backgroundColor = color;
 		marker.innerText = cluster.getChildCount().toString();
 		marker.classList.add("custom_cluster_marker");
-		
+
 		return L.divIcon({
 			html: marker,
 			// className: "",
@@ -168,104 +178,105 @@ const Map: React.FC<MapProps> = ({ coords, address, updatePosition, activeLayers
 	}
 
 	return (
-		<MapContainer className="map" center={PRAGUE_CENTER} zoom={STARTING_MAP_ZOOM} maxZoom={MAX_MAP_ZOOM} minZoom={MIN_MAP_ZOOM} style={{ height: "100%" }}>
-			<TileLayer
-				// url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-				url={MAPYCZ_API_URL}
-			/>
-			<Polyline positions={PRAHA_BORDER} color="black" />
-			<Marker position={userCoords} icon={current_marker_icon}>
-				<Popup>
-					<h3>Vaše poloha</h3>
-				</Popup>
-			</Marker>
-			{/* <CircleMarker center={userCoords} radius={2} /> */}
-			<SetView coords={userCoords} zoom={mapZoom} shouldMove={shouldMove} setShouldMove={setShouldMove} />
-			{/* <Polygon pathOptions={{ color: "gray" }} positions={TEST_POLYGON} /> */}
-			<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["trash"])}>
-				{kontejnerySelected && kontejnerList.map((k, i) => (
-					<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["trash"], fillOpacity: 1, stroke: false }} key={i}>
+		<>
+			<MapContainer className="map" center={PRAGUE_CENTER} zoom={STARTING_MAP_ZOOM} maxZoom={MAX_MAP_ZOOM} minZoom={MIN_MAP_ZOOM}>
+				<TileLayer
+					// url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+					url={MAPYCZ_API_URL}
+				/>
+				<Polyline positions={PRAHA_BORDER} color="black" />
+				<Marker position={userCoords} icon={current_marker_icon}>
+					<Popup>
+						<h3>Vaše poloha</h3>
+					</Popup>
+				</Marker>
+				{/* <CircleMarker center={userCoords} radius={2} /> */}
+				<SetView coords={userCoords} zoom={mapZoom} shouldMove={shouldMove} setShouldMove={setShouldMove} />
+				{/* <Polygon pathOptions={{ color: "gray" }} positions={TEST_POLYGON} /> */}
+				<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["trash"])}>
+					{kontejnerySelected && kontejnerList.map((k, i) => (
+						<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["trash"], fillOpacity: 1, stroke: false }} key={i}>
+							<Popup>
+								<h3>{`Sběrné místo odpadu - ${k.extraData['TRASHTYPENAME']}`}</h3>
+							</Popup>
+						</CircleMarker>
+					))}
+				</MarkerClusterGroup>
+
+				<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["zachody"])}>
+					{showVerejneWc && toaletyList.map((k, i) => (
+						<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["zachody"], fillOpacity: 1, stroke: false }} key={i}>
+							<Popup>
+								<h3>{`Veřejné toalety`}</h3>
+							</Popup>
+						</CircleMarker>
+					))}
+				</MarkerClusterGroup>
+
+				<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["nabijecky"])}>
+					{showNabijecky && nabijeckyList.map((k, i) => (
+						<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["nabijecky"], fillOpacity: 1, stroke: false }} key={i}>
+							<Popup>
+								<h3>{`Nabíječka pro elektromobily`}</h3>
+								<GenericTable data={k.extraData} included_keys={['OperatorInfo', 'OperatorInfoWebsite', 'UsageType', 'MembershipRequired', 'PayAtLocation', 'KeyRequired', 'StatusType', 'Connections', 'NumberOfPoints']} />
+							</Popup>
+						</CircleMarker>
+					))}
+				</MarkerClusterGroup>
+
+				<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["parkomat"])}>
+					{showParkAutomaty && parkAutomatyList.map((k, i) => (
+						<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["parkomat"], fillOpacity: 1, stroke: false }} key={i}>
+							<Popup>
+								<h3>{`Parkovací automat`}</h3>
+								<GenericTable data={k.extraData} included_keys={['PA', 'PX', 'CODE', 'STREET']} />
+							</Popup>
+						</CircleMarker>
+					))}
+				</MarkerClusterGroup>
+
+				<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["parkztp"])}>
+					{showParkZtp && parkZtpList.map((k, i) => (
+						<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["parkztp"], fillOpacity: 1, stroke: false }} key={i}>
+							<Popup>
+								<h3>{`Parkovací místo pro držitele ZTP`}</h3>
+								<GenericTable data={k.extraData} />
+							</Popup>
+						</CircleMarker>
+					))}
+				</MarkerClusterGroup>
+
+				<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["pitka"])}>
+					{showPitka && pitkaList.map((k, i) => (
+						<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["pitka"], fillOpacity: 1, stroke: false }} key={i}>
+							<Popup>
+								<h3>{`Pítko`}</h3>
+								<GenericTable data={k.extraData} />
+								PAROnyma
+							</Popup>
+						</CircleMarker>
+					))}
+				</MarkerClusterGroup>
+
+
+
+
+
+				{showZakazAlkoholu && alkoholZones.map((z, i) => (
+					<Polygon pathOptions={{ color: LAYER_COLORS["zonaalko"], stroke: false }} positions={z} key={i} >
 						<Popup>
-							<h3>{`Sběrné místo odpadu - ${k.extraData['TRASHTYPENAME']}`}</h3>
+							<h3>{`Zákaz požívání alkoholu - ${getFullNameOfZoneType(alkoholProperties[i]["type"])} v okruhu ${alkoholProperties[i]["distance"]}m`}</h3>
 						</Popup>
-					</CircleMarker>
+					</Polygon>
 				))}
-			</MarkerClusterGroup>
-
-			<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["zachody"])}>
-				{showVerejneWc && toaletyList.map((k, i) => (
-					<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["zachody"], fillOpacity: 1, stroke: false }} key={i}>
-						<Popup>
-							<h3>{`Veřejné toalety`}</h3>
+				{showZakazKoureni && koureniZones.map((z, i) => (
+					<Polygon pathOptions={{ color: LAYER_COLORS["zonakouro"], stroke: false }} positions={z} key={i}>
+						<Popup >
+							<h3>{`Zákaz kouření - ${getFullNameOfZoneType(koureniProperties[i]["type"])} v okruhu ${koureniProperties[i]["distance"]}m`}</h3>
 						</Popup>
-					</CircleMarker>
-				))}
-			</MarkerClusterGroup>
+					</Polygon>))}
 
-			<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["nabijecky"])}>
-			{showNabijecky && nabijeckyList.map((k, i) => (
-				<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["nabijecky"], fillOpacity: 1, stroke: false }} key={i}>
-					<Popup>
-						<h3>{`Nabíječka pro elektromobily`}</h3>
-						<GenericTable data={k.extraData} included_keys={['OperatorInfo', 'OperatorInfoWebsite', 'UsageType', 'MembershipRequired', 'PayAtLocation', 'KeyRequired', 'StatusType', 'Connections', 'NumberOfPoints']} />
-					</Popup>
-				</CircleMarker>
-			))}
-			</MarkerClusterGroup>
-
-			<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["parkomat"])}>
-			{showParkAutomaty && parkAutomatyList.map((k, i) => (
-				<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["parkomat"], fillOpacity: 1, stroke: false }} key={i}>
-					<Popup>
-						<h3>{`Parkovací automat`}</h3>
-						<GenericTable data={k.extraData} included_keys={['PA', 'PX', 'CODE', 'STREET']} />
-					</Popup>
-				</CircleMarker>
-			))}
-			</MarkerClusterGroup>
-
-			<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["parkztp"])}>
-			{showParkZtp && parkZtpList.map((k, i) => (
-				<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["parkztp"], fillOpacity: 1, stroke: false }} key={i}>
-					<Popup>
-						<h3>{`Parkovací místo pro držitele ZTP`}</h3>
-						<GenericTable data={k.extraData} />
-					</Popup>
-				</CircleMarker>
-			))}
-			</MarkerClusterGroup>
-			
-			<MarkerClusterGroup maxClusterRadius={MARKER_CLUSTERING_MAX_RADIUS} disableClusteringAtZoom={MARKER_CLUSTERING_DISABLE_AT_ZOOM} spiderfyOnMaxZoom={true} showCoverageOnHover={false} iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, LAYER_COLORS["pitka"])}>
-			{showPitka && pitkaList.map((k, i) => (
-				<CircleMarker center={k.coords} radius={6} pathOptions={{ fillColor: LAYER_COLORS["pitka"], fillOpacity: 1, stroke: false }} key={i}>
-					<Popup>
-						<h3>{`Pítko`}</h3>
-						<GenericTable data={k.extraData} />
-						PAROnyma
-					</Popup>
-				</CircleMarker>
-			))}
-			</MarkerClusterGroup>
-
-
-
-
-
-			{showZakazAlkoholu && alkoholZones.map((z, i) => (
-				<Polygon pathOptions={{ color: LAYER_COLORS["zonaalko"], stroke: false }} positions={z} key={i} >
-					<Popup>
-						<h3>{`Zákaz požívání alkoholu - ${getFullNameOfZoneType(alkoholProperties[i]["type"])} v okruhu ${alkoholProperties[i]["distance"]}m`}</h3>
-					</Popup>
-				</Polygon>
-			))}
-			{showZakazKoureni && koureniZones.map((z, i) => (
-				<Polygon pathOptions={{ color: LAYER_COLORS["zonakouro"], stroke: false }} positions={z} key={i}>
-					<Popup>
-						<h3>{`Zákaz kouření - ${getFullNameOfZoneType(koureniProperties[i]["type"])} v okruhu ${koureniProperties[i]["distance"]}m`}</h3>
-					</Popup>
-				</Polygon>))}
-
-			<Control prepend position='topright'>
+				{showLayerBox && <Control prepend position='topright'>
 					<div className={"filter_menu_collapse" + (!showLayerMenu ? " collapsed" : "")} onClick={(e) => { setShowLayerMenu(!showLayerMenu) }}>
 						<IoIosArrowBack />
 					</div>
@@ -274,7 +285,7 @@ const Map: React.FC<MapProps> = ({ coords, address, updatePosition, activeLayers
 						<div className="filter_items">
 							<div>
 								<GrStatusGoodSmall color={LAYER_COLORS["trash"]} size={LAYER_ICON_SIZE} />
-								<input type="checkbox" id="kontejnery_enabled" onChange={(e) => { setKontejnerySelected(e.target.checked); if (selectedKontejner) updateLayers(selectedKontejner, e.target.checked) }} /> <label htmlFor="kontejnery_enabled">Kontejnery</label> &nbsp;
+								<input type="checkbox" id="kontejnery_enabled" onChange={(e) => { setKontejnerySelected(e.target.checked); if (selectedKontejner) updateLayers(selectedKontejner, e.target.checked) }} checked={kontejnerySelected} /> <label htmlFor="kontejnery_enabled">Kontejnery</label> &nbsp;
 								<select className={!kontejnerySelected ? "disabled" : ""} onChange={(e) => { if (selectedKontejner) updateLayers(selectedKontejner, false); setSelectedKontejner(e.target.value as KontejnerType); updateLayers(e.target.value as KontejnerType, true) }} value={selectedKontejner || "none"}>
 									<option disabled selected value="none">--vyberte--</option>
 									{Object.entries(containerTypeMap).map(([k, v]) => <option value={v} selected key={v}>{k}</option>)}
@@ -282,7 +293,7 @@ const Map: React.FC<MapProps> = ({ coords, address, updatePosition, activeLayers
 							</div>
 							<div>
 								<GrStatusGoodSmall color={LAYER_COLORS["zachody"]} size={LAYER_ICON_SIZE} />
-								<input type="checkbox" id="verejne_wc" checked={showVerejneWc} onChange={(e) => { setShowVerejneWc(e.target.checked); updateLayers('verejne_wc', e.target.checked) }} /> <label htmlFor="verejne_wc">Zobrazit veřejné toalety</label>
+								<input type="checkbox" id="verejne_wc" checked={showVerejneWc} onChange={(e) => { setShowVerejneWc(e.target.checked); updateLayers('verejne_wc', e.target.checked); }} /> <label htmlFor="verejne_wc">Zobrazit veřejné toalety</label>
 							</div>
 							<div>
 								<GrStatusGoodSmall color={LAYER_COLORS["nabijecky"]} size={LAYER_ICON_SIZE} />
@@ -302,7 +313,9 @@ const Map: React.FC<MapProps> = ({ coords, address, updatePosition, activeLayers
 							</div>
 							<div>
 								<GrStatusGoodSmall color={LAYER_COLORS["zonaalko"]} size={LAYER_ICON_SIZE} />
-								<input type="checkbox" id="zakaz_alkoholu" checked={showZakazAlkoholu} onChange={(e) => { setShowZakazAlkoholu(e.target.checked); updateLayers('alkohol', e.target.checked) }} /> <label htmlFor="zakaz_alkoholu">Zobrazit zóny se zákazem alkoholu</label>
+								<input type="checkbox" id="zakaz_alkoholu" checked={showZakazAlkoholu} onChange={(e) => {
+									setLoadingEnabled(true); setShowZakazAlkoholu(e.target.checked); updateLayers('alkohol', e.target.checked);
+								}} /> <label htmlFor="zakaz_alkoholu">Zobrazit zóny se zákazem alkoholu</label>
 							</div>
 							<div>
 								<GrStatusGoodSmall color={LAYER_COLORS["zonakouro"]} size={LAYER_ICON_SIZE} />
@@ -310,11 +323,13 @@ const Map: React.FC<MapProps> = ({ coords, address, updatePosition, activeLayers
 							</div>
 						</div>
 					</div>
-			</Control>
-			<Control prepend position='bottomright'>
-				<button className="follow_user_button" onClick={() => { setShouldMove(true); updatePosition(); }}><img src="./icons/current_icon.png" width={32} height={45} /></button>
-			</Control>
-		</MapContainer>
+				</Control>}
+				<Control prepend position='bottomright'>
+					<button className="follow_user_button" onClick={() => { setShouldMove(true); updatePosition(); }}><img src="./icons/current_icon.png" width={32} height={45} /></button>
+				</Control>
+			</MapContainer>
+			<LoadingScreen enabled={loadingEnabled} />
+		</>
 	);
 }
 
