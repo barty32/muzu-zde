@@ -6,13 +6,14 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
-import { getData, getNoiseLevel } from './data';
+import { getPointData } from './data';
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
 import Nav from './components/Nav';
 import { MAPYCZ_API_KEY } from './constants';
 import { Coords } from './types';
 import { LatLng } from 'leaflet';
+import DetailPage from './pages/DetailPage';
 
 function App() {
 	const [coords, setCoords] = useState<LatLng | null>(null)
@@ -57,18 +58,19 @@ function App() {
 	// });
 
 	return (
-		<div>
+		// <div>
 			<BrowserRouter>
 				<Nav coords={coords} address={address} />
 				<main>
 					<Routes>
-						<Route index element={<HomePage coords={coords} address={address} />} />
-						<Route path="/map" element={<MapPage coords={coords} address={address}/>} />
+						<Route index element={<HomePage />} />
+						<Route path="/map" element={<MapPage coords={coords} address={address} />} />
+						<Route path="/detail" element={<DetailPage coords={coords}/>} />
 					</Routes>
 				</main>
 			</BrowserRouter>
 
-		</div>
+		// </div>
 	);
 }
 
