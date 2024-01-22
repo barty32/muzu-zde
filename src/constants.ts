@@ -1,6 +1,6 @@
 import {LatLngExpression} from 'leaflet';
 
-export const MAPYCZ_API_KEY = '-8wUGJ0s3vIknPaeQsGo717QZZLNcx4DDPJqaAB75Kw';
+export const MAPYCZ_API_KEY = 'API_KEY';
 export const MAPYCZ_API_URL =
     `https://api.mapy.cz/v1/maptiles/basic/256/{z}/{x}/{y}?apikey=${
         MAPYCZ_API_KEY}`;
