@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/muzu-zde/static/css/main.376c1a35.css",
-    "main.js": "/muzu-zde/static/js/main.30ed4ca5.js",
+    "main.css": "/muzu-zde/static/css/main.437e69f4.css",
+    "main.js": "/muzu-zde/static/js/main.7fe6a0ab.js",
     "index.html": "/muzu-zde/index.html",
-    "main.376c1a35.css.map": "/muzu-zde/static/css/main.376c1a35.css.map",
-    "main.30ed4ca5.js.map": "/muzu-zde/static/js/main.30ed4ca5.js.map"
+    "main.437e69f4.css.map": "/muzu-zde/static/css/main.437e69f4.css.map",
+    "main.7fe6a0ab.js.map": "/muzu-zde/static/js/main.7fe6a0ab.js.map"
   },
   "entrypoints": [
-    "static/css/main.376c1a35.css",
-    "static/js/main.30ed4ca5.js"
+    "static/css/main.437e69f4.css",
+    "static/js/main.7fe6a0ab.js"
   ]
 }
