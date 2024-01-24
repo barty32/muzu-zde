@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
-import { Coords } from "../types";
 import { LatLng } from "leaflet";
 import { MdEditLocationAlt } from "react-icons/md";
-import { MdOutlineEditLocation } from "react-icons/md";
 import { MdMyLocation } from "react-icons/md";
 
 export interface NavProps {
@@ -26,8 +24,6 @@ const Nav: React.FC<NavProps> = ({ coords, address, openPicker, hasRealPosition,
 				</div>
 				{hasRealPosition ? <MdEditLocationAlt onClick={openPicker} style={{ cursor: "pointer" }} size={35} /> : <MdMyLocation onClick={() => setHasRealPosition(true)} style={{ cursor: "pointer" }} size={35} />}
 			</div>
-
-
 		</nav>
 	);
 }

@@ -1,6 +1,6 @@
 import { LatLng } from "leaflet";
 import Zone from "../components/Zone";
-import { DetailType, ZoneType } from "../types";
+import { DetailType } from "../types";
 import POIList from "../components/POIList";
 
 export interface DetailPageProps {

@@ -1,9 +1,7 @@
 import { LatLng } from "leaflet";
-import { POI, PointType, ZoneType } from "../types";
-import { formatDistance, getAlcoholAllowed, getDistance, getPointData, getSmokingAllowed } from "../data";
+import { POI } from "../types";
+import { formatDistance, getDistance } from "../data";
 import { useEffect, useState } from "react";
-import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import { FaQuestion } from "react-icons/fa";
 import { MAPYCZ_API_KEY } from "../constants";
 import { FaMapMarkedAlt } from "react-icons/fa";
 
@@ -19,7 +17,7 @@ export interface POIRowProps {
 
 const POIRow: React.FC<POIRowProps> = ({ coords, poi, onMapOpened, fontSize }) => {
 
-	const [data, setData] = useState<string[]>(['']);
+	const data: string[] = [];
 	const [address, setAddress] = useState('');
 
 	useEffect(() => {

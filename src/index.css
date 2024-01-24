@@ -199,6 +199,10 @@ h1 a {
 	padding: 3px;
 }
 
+.generic_table td:nth-child(2) {
+	word-wrap: anywhere;
+}
+
 
 .filter_bar_menu {
 	display: flex;

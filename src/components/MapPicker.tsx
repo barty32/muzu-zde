@@ -2,8 +2,7 @@ import { Marker, Polyline, TileLayer, useMap } from "react-leaflet";
 import { MapContainer } from "react-leaflet";
 import { MAPYCZ_API_URL, MAX_MAP_ZOOM, MIN_MAP_ZOOM, PRAGUE_CENTER, STARTING_MAP_ZOOM } from "../constants";
 import { PRAHA_BORDER } from "../praha_border";
-import { Icon, LatLng, LatLngTuple } from "leaflet";
-import { useState } from "react";
+import { Icon, LatLng } from "leaflet";
 import Modal from 'react-modal';
 
 export interface MapPickerProps {

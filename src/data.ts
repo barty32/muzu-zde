@@ -1,17 +1,6 @@
-
-// import { GeoJSON } from "react-leaflet";
-import {Feature, FeatureCollection, GeoJSON, GeoJsonProperties, MultiPolygon, Point, Polygon, Position} from 'geojson';
-import {LatLng, LatLngTuple} from 'leaflet';
-
-import {containerTypeMap, Coords, KontejnerType, POI, PointType} from './types';
-
-
-// export enum DetailTypes{
-// 	Alkohol,
-// 	nabijeci_stanice
-// }
-
-
+import { FeatureCollection, GeoJsonProperties, Point, Polygon, Position } from 'geojson';
+import { LatLng, LatLngTuple } from 'leaflet';
+import { containerTypeMap, KontejnerType, POI, PointType } from './types';
 
 async function getWcData(): Promise<POI[]> {
   const data = await (await fetch('./data/verejne_wc.geojson')).json() as
@@ -99,7 +88,7 @@ async function getKontejnerData(type: KontejnerType): Promise<POI[]> {
       FeatureCollection;
   let result: POI[] = [];
   for (const feature of data.features) {
-    if (containerTypeMap[feature.properties!['TRASHTYPENAME']] != type)
+    if (containerTypeMap[feature.properties!['TRASHTYPENAME']] !== type)
       continue;
     const id = feature.properties ? feature.properties['OBJECTID'] : '';
     const coords = convertCoords3857((feature.geometry as Point).coordinates);
@@ -113,17 +102,11 @@ async function getKontejnerData(type: KontejnerType): Promise<POI[]> {
 export async function getPointData(type: PointType) /*: Promise<POI[]>*/ {
   switch (type) {
     case 'kontejner_papir':
-      // return getKontejnerData(ContainerType.papir);
     case 'kontejner_plast':
-      // return getKontejnerData(ContainerType.plast);
     case 'kontejner_tetrapak':
-      // return getKontejnerData(ContainerType.tetrapak);
     case 'kontejner_sklo_barevne':
-      // return getKontejnerData(ContainerType.sklo_barevne);
     case 'kontejner_sklo_cire':
-    // return getKontejnerData(ContainerType.sklo_cire);
     case 'kontejner_kov':
-    // return getKontejnerData(ContainerType.kov);
     case 'kontejner_elektro':
       return getKontejnerData(type);
 
@@ -191,18 +174,6 @@ export async function getSmokingAllowed(coords: LatLng):
 // 	}
 // 	return null;
 // }
-
-
-
-async function getClosest(type: string, coords: Coords) {
-  let json: GeoJSON;
-
-  switch (type) {
-    case 'wc':
-      json = await (await fetch('./data/.geojson')).json();
-      break;
-  }
-}
 
 
 function convertCoords(input: Position): LatLng {
@@ -323,7 +294,8 @@ export function getFullNameOfZoneType(
     case 'zdravotni_zarizeni':
       return sklonovat ? 'zdravotního zařízení' : 'Zdravotní zařízení';
   }
-  throw 'Invalid input';
+	//throw new Error('Invalid input');
+	return '';
 }
 
 export function formatDistance(dist: number) {

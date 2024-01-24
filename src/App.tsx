@@ -1,20 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import logo from './logo.svg';
-import Map from './components/Map';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-
 import 'leaflet/dist/leaflet.css';
-
-import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
-import { getPointData } from './data';
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
 import Nav from './components/Nav';
 import { MAPYCZ_API_KEY } from './constants';
-import { Coords } from './types';
-import { LatLng, LatLngTuple } from 'leaflet';
+import { LatLng } from 'leaflet';
 import DetailPage from './pages/DetailPage';
-import LoadingScreen from './components/LoadingScreen';
 import AboutPage from './pages/AboutPage';
 import MapPicker from './components/MapPicker';
 
@@ -38,20 +30,18 @@ function App() {
 			const addressObject = d["items"][0];
 			const fullAddress = `${addressObject["name"]}, ${addressObject["location"]}`;
 			setAddress(fullAddress);
-			console.log("setting position");
-			// getNoiseLevel(crds).then((a) => {
-			// 	console.log(a);
-			// })
+			//console.log("setting position");
 		});
 	}
-	const positionCallback: PositionCallback = (position) => {
+
+	const positionCallback: PositionCallback = useCallback((position) => {
 		if(!hasRealPositionRef.current) return;
 		const coords = position.coords;
 		setPosition(new LatLng(coords.latitude, coords.longitude));
-		// console.log(coords);
-		// console.log(position.coords.latitude, position.coords.longitude);
-	};
-	const updatePosition = () => {
+		console.log(`Got new coordinates: ${coords.latitude}, ${coords.longitude}`);
+	}, []);
+
+	const updatePosition = useCallback(() => {
 		if ("geolocation" in navigator) {
 			navigator.geolocation.getCurrentPosition((pos) => {
 				positionCallback(pos);
@@ -59,20 +49,21 @@ function App() {
 		} else {
 			console.warn("Geolocation API not available");
 		}
-	}
+	}, [positionCallback]);
+
 	useEffect(() => {
 		// console.log(hasRealPosition);
 		if ("geolocation" in navigator) {
 			if (hasRealPosition) {
-				console.log(watchIdRef.current.length);
+				//console.log(watchIdRef.current.length);
 				if (watchIdRef.current.length > 0) return;
 				updatePosition();
 				const wchId = navigator.geolocation.watchPosition(positionCallback);
-				console.log(wchId);
+				//console.log(wchId);
 				setWatchIds([...watchIdRef.current, wchId]);
 			} else {
-				console.log(watchIdRef.current)
-				if (watchIdRef.current.length == 0) return;
+				//console.log(watchIdRef.current)
+				if (watchIdRef.current.length === 0) return;
 				for (const id of watchIdRef.current) {
 					navigator.geolocation.clearWatch(id);
 				}
@@ -81,20 +72,7 @@ function App() {
 		} else {
 			console.warn("Geolocation API not available");
 		}
-		// getNoiseLevel({
-		// 	lat: 50.1134656,
-		// 	lon: 14.4434947,
-		// })
-
-		// getNoiseLevel({
-		// 	lat: 50.0996278,
-		// 	lon: 14.4460964,
-		// })
-	}, [hasRealPosition]);
-
-	// getData().then((val) => {
-	// 	console.log(val);
-	// });
+	}, [hasRealPosition, updatePosition, positionCallback]);
 
 	const [pickerOpened, setPickerOpened] = useState<boolean>(false);
 
@@ -103,7 +81,7 @@ function App() {
 	return (
 		// <div>
 		<>
-			<BrowserRouter>
+			<BrowserRouter basename="/muzu-zde">
 				<Nav coords={coords} address={address} openPicker={openPicker} hasRealPosition={hasRealPosition} setHasRealPosition={setHasRealPosition} />
 				<main>
 					<Routes>

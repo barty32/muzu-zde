@@ -1,4 +1,3 @@
-import MapPicker from "../components/MapPicker";
 
 export interface AboutPageProps { }
 

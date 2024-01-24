@@ -1,4 +1,4 @@
-import { LatLng, LatLngExpression, LatLngTuple } from "leaflet";
+import { LatLng, LatLngTuple } from "leaflet";
 
 export type POI = PointOfInterest;
 export interface PointOfInterest {

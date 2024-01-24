@@ -1,6 +1,6 @@
-import { LatLng, map } from "leaflet";
+import { LatLng } from "leaflet";
 import Map from "../components/Map";
-import { Coords, DetailType } from "../types";
+import { DetailType } from "../types";
 import { useSearchParams } from "react-router-dom";
 export interface MapPageProps {
 	coords: LatLng | null;
@@ -13,13 +13,15 @@ const MapPage: React.FC<MapPageProps> = ({ coords, address, updatePosition }) =>
 	const [query, setQuery] = useSearchParams();
 
 	const updateLayers = (layer: DetailType, val: boolean) => {
-		const mapLayers = query.get('map_layers')?.split(',') || [];
+		let mapLayers = query.get('map_layers')?.split(',') || [];
 		if (val) {
+			//enable layer
 			if (layer && !mapLayers.includes(layer)) mapLayers.push(layer);
 		}
 		else {
-			mapLayers.filter((name, i) => {
-				if (name == layer) mapLayers.splice(i, 1);
+			//disable layer
+			mapLayers = mapLayers.filter((name) => {
+				return (name === layer) ? false : true;//mapLayers.splice(i, 1);
 			})
 		}
 		query.set('map_layers', mapLayers.join(','));
@@ -28,7 +30,7 @@ const MapPage: React.FC<MapPageProps> = ({ coords, address, updatePosition }) =>
 	// const query = new URLSearchParams(document.location.search);
 	const mapLayers = query.get('map_layers')?.split(',') || [];
 
-	return (<div style={{ height: "100%", position: "relative", overflow: "hidden" }}><Map coords={coords} updatePosition={updatePosition} activeLayers={mapLayers} updateLayers={updateLayers} showLayerBox={ true } /></div>);
+	return (<div style={{ height: "100%", position: "relative", overflow: "hidden" }}><Map coords={coords} updatePosition={updatePosition} activeLayers={mapLayers} updateLayers={updateLayers} showLayerBox={ true } markerTitle="Vaše poloha" /></div>);
 }
 
 export default MapPage;

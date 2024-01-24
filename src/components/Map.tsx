@@ -1,14 +1,12 @@
 import { MapContainer, TileLayer, useMap, Marker, Popup, Polyline, Polygon, CircleMarker } from "react-leaflet";
-import { HAS_COORDS_MAP_ZOOM, LAYER_COLORS, LAYER_ICON_SIZE, MAPYCZ_API_KEY, MAPYCZ_API_URL, MARKER_CLUSTERING_DISABLE_AT_ZOOM, MAX_MAP_ZOOM, MIN_MAP_ZOOM, PRAGUE_CENTER, STARTING_MAP_ZOOM, MARKER_CLUSTERING_MAX_RADIUS } from "../constants";
+import { HAS_COORDS_MAP_ZOOM, LAYER_COLORS, LAYER_ICON_SIZE, MAPYCZ_API_URL, MARKER_CLUSTERING_DISABLE_AT_ZOOM, MAX_MAP_ZOOM, MIN_MAP_ZOOM, PRAGUE_CENTER, STARTING_MAP_ZOOM, MARKER_CLUSTERING_MAX_RADIUS } from "../constants";
 import { PRAHA_BORDER } from "../praha_border";
-import { Coords, DetailType, KontejnerType, POI, Zone } from "../types";
+import { DetailType, KontejnerType, POI, Zone } from "../types";
 import { useEffect, useState } from "react";
 import L, { Icon, LatLng, LatLngExpression, MarkerCluster } from "leaflet";
-import { TEST_POLYGON } from "../test_data";
 import { getFullNameOfZoneType, getGEOJSONZoneData, getPointData } from "../data";
 import { containerTypeMap } from "../types";
 import GenericTable from "./GenericTable";
-import { log } from "console";
 import Control from 'react-leaflet-custom-control'
 import { IoIosArrowBack } from "react-icons/io";
 import { GrStatusGoodSmall } from "react-icons/gr";
@@ -40,9 +38,10 @@ export interface MapProps {
 	activeLayers: string[];
 	updateLayers: (layer: DetailType, val: boolean) => void;
 	showLayerBox: boolean;
+	markerTitle: string;
 }
 
-const Map: React.FC<MapProps> = ({ coords, updatePosition, activeLayers, updateLayers, showLayerBox }) => {
+const Map: React.FC<MapProps> = ({ coords, updatePosition, activeLayers, updateLayers, showLayerBox, markerTitle }) => {
 
 	const [userCoords, setUserCoords] = useState<LatLngExpression>(PRAGUE_CENTER);
 	const [mapZoom, setMapZoom] = useState<number>(STARTING_MAP_ZOOM);
@@ -187,7 +186,7 @@ const Map: React.FC<MapProps> = ({ coords, updatePosition, activeLayers, updateL
 				<Polyline positions={PRAHA_BORDER} color="black" />
 				<Marker position={userCoords} icon={current_marker_icon}>
 					<Popup>
-						<h3>Vaše poloha</h3>
+						<h3>{ markerTitle }</h3>
 					</Popup>
 				</Marker>
 				{/* <CircleMarker center={userCoords} radius={2} /> */}
@@ -325,7 +324,7 @@ const Map: React.FC<MapProps> = ({ coords, updatePosition, activeLayers, updateL
 					</div>
 				</Control>}
 				<Control prepend position='bottomright'>
-					<button className="follow_user_button" onClick={() => { setShouldMove(true); updatePosition(); }}><img src="./icons/current_icon.png" width={32} height={45} /></button>
+					<button className="follow_user_button" onClick={() => { setShouldMove(true); updatePosition(); }}><img src="./icons/current_icon.png" width={32} height={45} alt="vycentrovat"/></button>
 				</Control>
 			</MapContainer>
 			<LoadingScreen enabled={loadingEnabled} />

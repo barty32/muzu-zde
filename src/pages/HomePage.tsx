@@ -1,6 +1,4 @@
-import { LatLng } from "leaflet";
 import BigButton from "../components/BigButton";
-import { Coords, DetailType } from "../types";
 import { IoIosBeer } from "react-icons/io";
 import { FaSmoking } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -11,7 +9,6 @@ import { FaChargingStation } from "react-icons/fa";
 import { FaHandHoldingWater } from "react-icons/fa";
 import { TbDisabled } from "react-icons/tb";
 import { GiMetalBar } from "react-icons/gi";
-import MapPicker from "../components/MapPicker";
 
 export interface HomePageProps {
 	//coords: LatLng | null;

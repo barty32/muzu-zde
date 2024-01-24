@@ -1,9 +1,7 @@
 import { LatLng } from "leaflet";
-import { POI, PointType, ZoneType } from "../types";
-import { formatDistance, getAlcoholAllowed, getDistance, getPointData, getSmokingAllowed } from "../data";
+import { POI, PointType } from "../types";
+import { getDistance, getPointData } from "../data";
 import { useEffect, useState } from "react";
-import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import { FaQuestion } from "react-icons/fa";
 import POIRow from "./POIRow";
 import { Link } from "react-router-dom";
 import Modal from 'react-modal';
@@ -36,7 +34,7 @@ const POIList: React.FC<POIListProps> = ({ type, coords, updatePosition }) => {
 			}
 		});
 
-	}, [coords]);
+	}, [coords, type]);
 
 	const showMore = (numOfElements = 10) => {
 		setNumElements(numElements + numOfElements);
@@ -59,13 +57,13 @@ const POIList: React.FC<POIListProps> = ({ type, coords, updatePosition }) => {
 
 	const tableHeaders = ['Vzdálenost', 'Ulice'];
 
-	if (type == 'park_automat') {
+	if (type === 'park_automat') {
 		tableHeaders.push('Kód', 'Zóna');
 	}
-	else if (type == 'park_ztp') {
+	else if (type === 'park_ztp') {
 		tableHeaders.push('Počet');
 	}
-	else if (type == 'nabijeci_stanice') {
+	else if (type === 'nabijeci_stanice') {
 		tableHeaders.push('Provozovatel');
 	}
 	else if (type.includes('kontejner')) {
@@ -106,7 +104,7 @@ const POIList: React.FC<POIListProps> = ({ type, coords, updatePosition }) => {
 					<button className="modal_close" onClick={() => setMapModalOpen(false)}>&times;</button>
 				</div>
 				<div className="modal_map_wrapper">
-					<Map coords={activeItem?.coords!} updatePosition={updatePosition} activeLayers={[activeItem?.type!]} updateLayers={() => { }} showLayerBox={false} />
+					<Map coords={activeItem?.coords!} updatePosition={updatePosition} activeLayers={[activeItem?.type!]} updateLayers={() => { }} showLayerBox={false} markerTitle="" />
 				</div>
 			</Modal>
 
